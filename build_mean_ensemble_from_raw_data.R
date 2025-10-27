@@ -55,7 +55,7 @@ formatRast <- function(rst,the_shape) {
 
 #input the word shape file containing country boundaries
 input_fold<-'./Input/'
-output_fold<-'./Output2/'
+output_fold<-'./Output/'
 dir.create(paste0(output_fold,'Intermediate/'),recursive=T)
 world_shape <- st_read(paste0(input_fold,'world_shape2.geojson'))
 
@@ -299,6 +299,7 @@ for (period in 1:3){
   writeRaster(all_years, paste0(output_fold,'Intermediate/',names[period],'_ensemble_flood.tif'), format = "GTiff", overwrite = TRUE)
 
 }
+
 
 
 
