@@ -55,7 +55,7 @@ formatRast <- function(rst,the_shape) {
 
 #input the word shape file containing country boundaries
 input_fold<-'./Input/'
-output_fold<-'./Output/'
+output_fold<-'./Output2/'
 dir.create(paste0(output_fold,'Intermediate/'),recursive=T)
 world_shape <- st_read(paste0(input_fold,'world_shape2.geojson'))
 
@@ -90,8 +90,8 @@ for (y in year_ind){
   modeled_per_year[[which(year_ind==y)]]<-model_stack
 }
 
-saveRDS(modeled_per_year,paste0(output_fold,'/Intermediate/baseline_drought_per_model_per_year.RData'))
-modeled_per_year<-readRDS(paste0(output_fold,'/Intermediate/baseline_drought_per_model_per_year.RData'))
+#saveRDS(modeled_per_year,paste0(output_fold,'/Intermediate/baseline_drought_per_model_per_year.Rds'))
+#modeled_per_year<-readRDS(paste0(output_fold,'/Intermediate/baseline_drought_per_model_per_year.Rds'))
 
 #aggregate the observations to the model resolution
 base_SPEI2<-projectRaster(base_SPEI,modeled_per_year[[1]][[1]])
@@ -110,7 +110,8 @@ for (y in year_ind){
   the_rast <- raster::calc(yearly_rast_stack,fun=function(x) if(all(is.na(x))) NA_integer_ else sum(x, na.rm=TRUE))
   all_years<-addLayer(all_years,the_rast)
 }
-saveRDS(all_years,paste0(output_fold,'Intermediate/hist_ensemble_drought.RData'))
+#saveRDS(all_years,paste0(output_fold,'Intermediate/hist_ensemble_drought.RData'))
+writeRaster(all_years, paste0(output_fold,'Intermediate/hist_ensemble_drought.tif'), format = "GTiff", overwrite = TRUE)
 
 #future projection (SSP585)
 example_brick<-raster::brick(paste0(input_fold,'SPEI/ssp585/spei12_december_',model_names[1],'_ssp585.nc'))
@@ -127,7 +128,9 @@ for (y in year_ind){
   the_rast <- raster::calc(yearly_rast_stack,fun=function(x) if(all(is.na(x))) NA_integer_ else sum(x, na.rm=TRUE))
   all_years<-addLayer(all_years,the_rast)
 }
-saveRDS(all_years,paste0(output_fold,'Intermediate/ssp_ensemble_drought.RData'))
+#saveRDS(all_years,paste0(output_fold,'Intermediate/ssp_ensemble_drought.RData'))
+writeRaster(all_years, paste0(output_fold,'Intermediate/ssp_ensemble_drought.tif'), format = "GTiff", overwrite = TRUE)
+
 
 #future projection (SSP126)
 all_f_ssp1<-list.files(paste0(input_fold,'SPEI/ssp126/'),pattern='.nc4$')
@@ -162,7 +165,9 @@ for (y in (1:length(modeled_per_year))){
   the_rast <- raster::calc(yearly_rast_stack,fun=function(x) if(all(is.na(x))) NA_integer_ else sum(x, na.rm=TRUE))
   all_years<-addLayer(all_years,the_rast)
 }
-saveRDS(all_years,paste0(output_fold,'Intermediate/ssp126_ensemble_drought.RData'))
+#saveRDS(all_years,paste0(output_fold,'Intermediate/ssp126_ensemble_drought.RData'))
+writeRaster(all_years, paste0(output_fold,'Intermediate/ssp126_ensemble_drought.tif'), format = "GTiff", overwrite = TRUE)
+
 
 
 ######################################################
@@ -185,7 +190,8 @@ for (b in (1:length(all_f))){
   all_bricks<-append(all_bricks,br)
 }
 #build the mean ensemble and make it to the same resolution as the SPEI
-drought_ref<-readRDS(paste0(output_fold,'Intermediate/hist_ensemble_drought.RData'))
+#drought_ref<-readRDS(paste0(output_fold,'Intermediate/hist_ensemble_drought.RData'))
+drought_ref<-raster(paste0(output_fold,'Intermediate/hist_ensemble_drought.tif'))
 all_years<-raster::stack()
 for (y in 1:nlayers(the_brick)){
   yearly_rast_stack<-raster::stack()
@@ -196,14 +202,18 @@ for (y in 1:nlayers(the_brick)){
   the_rast<-projectRaster(the_rast,drought_ref[[1]])
   all_years<-addLayer(all_years,the_rast)
 }
-saveRDS(all_years,paste0(output_fold,'Intermediate/hist_ensemble_heat.RData'))
+#saveRDS(all_years,paste0(output_fold,'Intermediate/hist_ensemble_heat.RData'))
+writeRaster(all_years, paste0(output_fold,'Intermediate/hist_ensemble_heat.tif'), format = "GTiff", overwrite = TRUE)
+
 
 #heat future (ssp585)
 future_heat<-raster::brick(paste0(input_fold,'HI/ssp585/ENS_mean_out.nc'),varname='da_n_day')
 future_heat<-future_heat[[6:26]]
 future_heat<-projectRaster(future_heat,drought_ref[[1]])
 future_heat[future_heat<0]<-0
-saveRDS(future_heat,paste0(output_fold,'Intermediate/ssp_ensemble_heat.RData'))
+#saveRDS(future_heat,paste0(output_fold,'Intermediate/ssp_ensemble_heat.RData'))
+writeRaster(future_heat, paste0(output_fold,'Intermediate/ssp_ensemble_heat.tif'), format = "GTiff", overwrite = TRUE)
+
 
 #heat future (ssp126)
 all_f<-list.files(paste0(input_fold,'HI/ssp126/'))
@@ -250,7 +260,7 @@ for (b in (1:length(all_f))){
   all_bricks<-append(all_bricks,br)
 }
 #build the mean ensemble and make it to the same resolution as the SPEI
-drought_ref<-readRDS(paste0(output_fold,'Intermediate/hist_ensemble_drought.RData'))
+drought_ref<-raster(paste0(output_fold,'Intermediate/hist_ensemble_drought.tif'))
 all_years<-raster::stack()
 for (y in 1:nlayers(the_brick)){
   yearly_rast_stack<-raster::stack()
@@ -261,7 +271,9 @@ for (y in 1:nlayers(the_brick)){
   the_rast<-projectRaster(the_rast,drought_ref[[1]])
   all_years<-addLayer(all_years,the_rast)
 }
-saveRDS(all_years,paste0(output_fold,'Intermediate/ssp126_ensemble_heat.RData'))
+#saveRDS(all_years,paste0(output_fold,'Intermediate/ssp126_ensemble_heat.RData'))
+writeRaster(all_years, paste0(output_fold,'Intermediate/ssp126_ensemble_heat.tif'), format = "GTiff", overwrite = TRUE)
+
 
 #################################
 ##flood
@@ -283,8 +295,9 @@ for (period in 1:3){
     the_rast <- stackApply(yearly_rast_stack, indices =  rep(1,nlayers(yearly_rast_stack)), fun = "mean", na.rm = T)
     all_years<-addLayer(all_years,the_rast)
   }
-  saveRDS(all_years,paste0(output_fold,'Intermediate/',names[period],'_ensemble_flood.RData'))
-  
+  #saveRDS(all_years,paste0(output_fold,'Intermediate/',names[period],'_ensemble_flood.RData'))
+  writeRaster(all_years, paste0(output_fold,'Intermediate/',names[period],'_ensemble_flood.tif'), format = "GTiff", overwrite = TRUE)
+
 }
 
 
