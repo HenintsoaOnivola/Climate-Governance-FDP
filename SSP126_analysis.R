@@ -99,12 +99,13 @@ world_shape <- st_read(paste0(input_fold,'world_shape2.geojson'))
 
 
 rast_list=vector("list", length = 6)
-rast_list[[1]]<-readRDS(paste0(output_fold,'./Intermediate/hist_ensemble_heat.RData'))
-rast_list[[2]]<-readRDS(paste0(output_fold,'./Intermediate/hist_ensemble_drought.RData'))
-rast_list[[3]]<-readRDS(paste0(output_fold,'./Intermediate/hist_ensemble_flood.RData'))
-rast_list[[4]]<-readRDS(paste0(output_fold,'./Intermediate/ssp126_ensemble_heat.RData'))
-rast_list[[5]]<-readRDS(paste0(output_fold,'./Intermediate/ssp126_ensemble_drought.RData'))
-rast_list[[6]]<-readRDS(paste0(output_fold,'./Intermediate/ssp126_ensemble_flood.RData'))
+
+rast_list[[1]]<-brick(paste0(output_fold,'./Intermediate/hist_ensemble_heat.tif'))
+rast_list[[2]]<-brick(paste0(output_fold,'./Intermediate/hist_ensemble_drought.tif'))
+rast_list[[3]]<-brick(paste0(output_fold,'./Intermediate/hist_ensemble_flood.tif'))
+rast_list[[4]]<-brick(paste0(output_fold,'./Intermediate/ssp126_ensemble_heat.tif'))
+rast_list[[5]]<-brick(paste0(output_fold,'./Intermediate/ssp126_ensemble_drought.tif'))
+rast_list[[6]]<-brick(paste0(output_fold,'./Intermediate/ssp126_ensemble_flood.tif'))
 
 #consider only terrestrial data (crop and mask marine data)
 ter_ensemble<-list()
